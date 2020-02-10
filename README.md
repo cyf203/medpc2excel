@@ -25,9 +25,13 @@ The file name of this MPC file should be the same as in the medpc data file.
 The medpc2excel will open the medpc data file and automatically search the used *.MPC file in the same directory.
 In *.MPC file, please explicitly declare each array as below:
 ```text
+<... your MPC code...>
+
     DIM C =9999  \ Levertype                     
     DIM D =9999  \ PelHLON                       
-    DIM E =9999  \ PelHLOFF                      
+    DIM E =9999  \ PelHLOFF   
+    
+<... your MPC code ...>
 ```
 
 ## Use medpc2excel

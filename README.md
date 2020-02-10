@@ -48,6 +48,8 @@ medpc_read.subj_list #return a list contains all subject ID
 medpc_read.get_subj_df (rat_id) #return a dataframe contains all timestamp arrays for rat #2
 ```
 
+Please download the  ```Example``` folder to your local disk and run the ```medpc2excel_example.py``` to give a try.
+
 ## Contributing
 
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change. 

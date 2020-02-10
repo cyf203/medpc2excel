@@ -29,7 +29,7 @@ Edited on Fri Jan 17 11:40 2020
 Edited on Fri Jan 17 17:11 2020
           Add the sort method for <common_var> list to fix the bug that cannot get the data from the last variable
 
-Version   1.4.0
+Version   1.4.1
 @author: ycheng62
 """
 

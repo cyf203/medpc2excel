@@ -54,5 +54,5 @@ Please make sure to update tests as appropriate
 OS\
 Pandas\
 Numpy\
-re\
+re
 

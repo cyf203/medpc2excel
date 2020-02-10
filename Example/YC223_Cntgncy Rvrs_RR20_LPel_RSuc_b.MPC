@@ -1,0 +1,289 @@
+\***************************************************************************************
+\                                    READ ME
+\***************************************************************************************
+\SCHEMATIC:
+
+\Total duration:               50min
+\Time resoluation:             10ms
+\Reward:                       45mg grain-based food pellet, 0.01s/pellet, total 1 pellet
+\                              20% sucrose, 2s for total 0.2mL/delivery
+\RewardCollectionTime:         4s
+\Final:
+\Training creatier:
+\Room#:                        Behavior Room 229
+\Author:                       Yifeng Cheng
+\Version:                      v.200116
+\Feature:
+\Comment:		       Revised on 01/16/2020 fixed bug on array P, Q
+\
+
+\***************************************************************************************
+\                DEFINE INPUTS, OUPUTS, ARRAY, LIST, AND Z-PULSE
+\***************************************************************************************
+\INPUTs ROOM 223
+^PE = 3                                                                                 \Left Port Entry
+^SuSPE = 4                                                                              \Left Port Entry duration
+\^LLP = 1                                                                               \Left lever press
+\^RLP = 2                                                                               \Right lever press
+^PelLP = 1
+^SucLP = 2
+
+\OUTPUTs ROOM 223
+^HL = 7                                                                                 \Houselight
+\^LLever = 1                                                                            \Left Lever
+\^RLever = 2                                                                            \Right Lever
+^PelLever = 1
+^SucLever = 2
+^Pel = 3                                                                                \Food dispenser, 0.01" per pellet
+^Suc = 9                                                                                \pump
+^MagLight = 12                                                                          \Magazine light
+^BoxLight = 26
+
+
+\Declare array A for working variables
+    DIM A = 100
+        \ A(0),SessionTimer(s), A(0),
+        \ A(1),LeverPress_Probability, A(1)
+        \ A(2),LeverType, A(2),
+        \ A(3),Peltrial_count, A(3),
+        \ A(4),Suctrial_count, A(4),
+        \ A(5),PelRwd_total, A(5),
+        \ A(6),SucRwd_total, A(6),
+        \ A(7),MaxTrial_time, A(7),
+        \ A(8),TrialTime_countdown, A(8),
+        \ A(9),PelLP_count,A(9),
+        \ A(10),SucLP_count,A(10),
+        \ A(11),PelPE_count,A(11),
+        \ A(12),PelPEdur,A(12)/100,
+        \ A(13),SucPE_count, A(13),
+        \ A(14),SucPEdur, A(14)/100,
+        \ A(15),ITIPE_count, A(15),
+        \ A(16),ITIPEdur, A(16)/100,
+        \ A(17),ITI_countdown, A(17),
+        \ A(18),PelRwd_count, A(18),
+        \ A(19),SucRwd_count, A(19)
+
+
+    LIST B = 1, 2                                \1 for pel, 2 for suc
+    DIM C =9999  \ Levertype                     C(A(3)+A(4)) \1 for pel, 2 for suc
+    DIM D =9999  \ PelHLON                       D(A(3))
+    DIM E =9999  \ PelHLOFF                      E(A(3))
+    DIM F =9999  \ PelLP                         F(A(9))
+    DIM P =9999  \ PelRwd                        P(A(5))
+    DIM G =9999  \ PelPEnt                       G(A(11))
+    DIM H =9999  \ PelPExit                      H(A(11))
+    DIM I =9999  \ SucHLON                       I(A(4))
+    DIM J =9999  \ SucHLOFF                      J(A(4))
+    DIM K =9999  \ SucLP                         K(A(10))
+    DIM Q =9999  \ SucRwd                        Q(A(6))
+    DIM L =9999  \ SucPEnt                       L(A(13))
+    DIM M =9999  \ SucPExit                      M(A(13))
+    DIM N =9999  \ ITIPEnt                       N(A(15))
+    DIM O =9999  \ ITIPExit                      O(A(15))
+
+
+\Z pulse links
+    \Z1  link to Peltrial start
+    \Z2  link to Suctrial start
+    \Z3  link to Peltrial end
+    \Z4  link to Suctrial end
+    \Z5  link to Pel delivery
+    \Z6  link to Suc delivery
+    \Z8  link to End Session and start Calculation
+    \Z9  link to STOPABORTFLUSH
+\***************************************************************************************
+\                                   HARDWARE TEST
+\***************************************************************************************
+S.S.1,
+    S1,
+        0.01": ON^HL, ^PelLever, ^SucLever, ^BoxLight ---> S2
+    S2,
+        #R^PelLP: ON^Pel; OFF^PelLever ---> S3
+        #R^SucLP: ON^Suc, ^MagLight; OFF^SucLever ---> S3
+    S3,
+        2": OFF^Pel, ^Suc, ^MagLight ---> S4
+    S4,
+        #R^PelLP: ON^Pel; OFF^PelLever ---> S5
+        #R^SucLP: ON^Suc, ^MagLight; OFF^SucLever ---> S5
+    S5,
+        2": OFF^Pel, ^Suc, ^MagLight ---> S6
+    S6,
+        0.01": OFF^HL; SHOW, 1, READY, A(0) ---> SX
+
+\***************************************************************************************
+\                                   SESSION CONTROL
+\***************************************************************************************
+S.S.2, \Main control
+    S1,
+        #START: SET A(1) = (0.05*10000); OFF^PelLever, ^SucLever --->S2                            \A(1) lever press probabilty (FR1=1, RR5=0.2, RR10=0.1, RR20 = 0.05)
+    S2,
+        0.01":  LOCKON^HL; RANDD A(2) = B;
+                IF (A(2) = 1) AND (A(3)<= 1) [@Pel, @Suc]
+                    @Pel: Z1; ON^PelLever ---> S3
+                    @Suc: Z2; ON^SucLever ---> S3
+    S3,
+        #Z3!#Z4: LOCKOFF^HL; OFF^SucLever, ^PelLever, ^MagLight ---> S4
+    S4,
+        2.5': IF (A(3) + A(4)) = 4 [@End, @CONT]
+                @End: Z8 ---> S5
+                @CONT: ---> S2
+    S5,
+        #Z9: ---> STOPABORTFLUSH
+
+S.S.3, \Pellet Trial
+    S1,
+        #Z1: SET A(18) = 0 ---> S2
+    S2,
+        #R^PelLP: WITHPI = A(1) [@RWD, @NoRWD]
+                        @RWD: Z5; ON^Pel; ADD A(18) ---> S3
+                        @NoRWD: ---> S2
+        #Z3: ---> S1
+    S3,
+        0.5": OFF^Pel;
+            IF A(18) = 10 [@End, @CONT]
+                @End: Z3; ADD A(3) ---> S1
+                @CONT: ---> S2
+                
+S.S.8,
+    S1,
+        #Z1: ---> S2
+    S2,
+        10': Z3; ADD A(3) ---> S1
+        #Z3: --->S1
+
+
+S.S.4, \Suc Trial
+    S1,
+        #Z2: SET A(19) = 0 ---> S2
+    S2,
+        #R^SucLP: WITHPI = A(1) [@RWD, @NoRWD]
+                        @RWD: Z6; ON^Suc, ^MagLight; ADD A(19) ---> S3
+                        @NoRWD: ---> S2
+        #Z4: ---> S1
+    S3,
+        2": OFF^Suc, ^MagLight;
+            IF A(19) = 10 [@End, @CONT]
+                @End: Z4; ADD A(4) ---> S1
+                @CONT: ---> S2
+                
+S.S.9,
+    S1,
+        #Z2: ---> S2
+    S2,
+        10': Z4; ADD A(4) ---> S1
+        #Z4: ---> S1
+
+
+\***************************************************************************************
+\                                   TIMER AND CLOCK
+\***************************************************************************************
+S.S.5,                                                                                  \Session timer
+    S1,
+        #START: SET A(0) = 0 ---> S2
+    S2,
+        0.01": SET A(0) = A(0)+0.01 --->SX
+
+S.S.6,                                                                                  \Max 10 min per trial
+    S1,
+        #Z1!#Z2: SET A(8) = 10' ---> S2
+    S2,
+        0.01": SET A(8) = A(8) - 1 ---> SX
+        #Z3!#Z4: --->S1
+
+S.S.7,
+    S1,
+        #Z3!#Z4: SET A(17) = 2.5' ---> S2
+    S2,
+        0.01": SET A(17) = A(17) - 1 ---> SX
+        #Z1!#Z2: ---> S1
+
+\***************************************************************************************
+\                           RESPONSES COUNTING AND RECORDING
+\***************************************************************************************
+S.S.10,
+    S1,
+        #START: ---> S2
+    S2,
+        #R^PelLP: SET F(A(9)) = A(0); ADD A(9) ---> SX
+        #R^SucLP: SET K(A(10)) = A(0); ADD A(10) ---> SX
+
+S.S.11,
+    S1,
+        #Z1: SET D(A(3)) = A(0)---> S2
+    S2,
+        #R^PE: ADD A(11); SET G(A(11)-1) = A(0) ---> SX
+        #R^SuSPE: ADD A(12); SET H(A(11)-1) = A(0) ---> SX
+        #Z3: SET E(A(3)) = A(0) ---> S1
+
+S.S.12,
+    S1,
+        #Z2: SET I(A(4)) = A(0) ---> S2
+    S2,
+        #R^PE: ADD A(13); SET L(A(13)-1) = A(0) ---> SX
+        #R^SuSPE: ADD A(14); SET M(A(13)-1) = A(0) ---> SX
+        #Z4: SET J(A(4)) = A(0) ---> S1
+
+S.S.13,
+    S1,
+        #Z3!#Z4: ---> S2
+    S2,
+        #R^PE: ADD A(15); SET N(A(15)-1) = A(0) ---> SX
+        #R^SuSPE: ADD A(16); SET O(A(15)-1) = A(0) ---> SX
+        #Z1!#Z2: ---> S1
+
+S.S.14,
+    S1,
+        #Z5: SET P(A(5)) = A(0); ADD A(5) ---> SX
+        #Z6: SET Q(A(6)) = A(0); ADD A(6) ---> SX
+
+S.S.15,
+    S1,
+        #Z1: SET C(A(3)+A(4)) = 1 ---> SX
+        #Z2: SET C(A(3)+A(4)) = 2 ---> SX
+
+\***************************************************************************************
+\                           DATA HANDLING AND BASIC STATISTIC
+\***************************************************************************************
+S.S.23, \STATIC AND DATA HANDLING
+    S1,
+        #START: --->S2
+    S2,
+        #Z8: SET A(12) = A(12)/100;
+             SET A(16) = A(16)/100;
+             SET C(A(3)+A(4))=-987.987;
+             SET D(A(3))=-987.987;
+             SET E(A(3))=-987.987;
+             SET F(A(9))=-987.987;
+             SET P(A(5))=-987.987;
+             SET G(A(11))=-987.987;
+             SET H(A(11))=-987.987;
+             SET I(A(4))=-987.987;
+             SET J(A(4))=-987.987;
+             SET K(A(10))=-987.987;
+             SET Q(A(6))=-987.987;
+             SET L(A(13))=-987.987;
+             SET M(A(13))=-987.987;
+             SET N(A(15))=-987.987;
+             SET O(A(15))=-987.987 --->S3                                               \-987.987 sealing the array
+    S3,
+        0.01": Z9 ---> S1                                                               \Calculation done and ready to STOPABORTFLUSH send Z7 signal out
+
+\***************************************************************************************
+\                                   ONLINE DISPLAY
+\***************************************************************************************
+S.S.24,
+    S1,
+        #START: ---> S2
+    S2,
+        0.01": SHOW 1,Session timer(s),A(0),
+                    2,TrialType, A(2),
+                    3,PelLP,A(9),
+                    4,Pel,A(5),
+                    5,PelPE,A(11),
+                    6,SucLP,A(10),
+                    7,Suc,A(6),
+                    8,SucPE,A(13),
+                    9,ITIPE,A(15),
+                    10,Block,A(3)+A(4),
+                    11,TrialTime countdown,A(8)/6000,
+                    12,ITI countdown, A(17)/6000 ---> SX

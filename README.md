@@ -51,8 +51,8 @@ Please make sure to update tests as appropriate
 
 ## Dependencies 
 
-OS/n
-Pandas/n
-Numpy/n
-re/n
+OS\
+Pandas\
+Numpy\
+re\
 

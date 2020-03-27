@@ -7,7 +7,7 @@ medpc2excel can also return a pandas DataFrame for further analysis
 
 I recommend installing an [Anaconda](https://www.anaconda.com/distribution/) distribution of Python -- Choose Python 3.7. 
 
-Use the package manager [pip](https://pip.pypa.io/en/stable/) to install medpc2excel. Current version is 1.4.1
+Use the package manager [pip](https://pip.pypa.io/en/stable/) to install medpc2excel. Current version is 1.5.5
 
 ```bash
 pip install medpc2excel
@@ -34,18 +34,21 @@ In *.MPC file, please explicitly declare each array as below:
 <... your MPC code ...>
 ```
 
-## Use medpc2excel
+## Running medpc2excel
 
+The most quickest way to start is to open the GUi from a command line terminal in anaconda cmd prompt:
+
+```
+python -m medpc2excel
+```
+
+You also can import this module and use the function called medpc_read as following
 ```python
 from medpc2excel import medpc_read
 
 f = <file path>
-rat_id = 2
 
-medpc_read(f, rat_id, replace = False) # return a m2e object
-medpc_read.date  #return the experiment data in the current data file
-medpc_read.subj_list #return a list contains all subject ID
-medpc_read.get_subj_df (rat_id) #return a dataframe contains all timestamp arrays for rat #2
+ts_df, log = medpc_read(f, replace = False) # return a timestamp dataframe and a log string
 ```
 
 Please download the  ```Example``` folder to your local disk and run the ```medpc2excel_example.py``` to give a try.
@@ -57,8 +60,7 @@ Please make sure to update tests as appropriate
 
 ## Dependencies 
 
-OS\
 Pandas\
 Numpy\
-re
-
+dill\
+openpyxl\

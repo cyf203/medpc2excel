@@ -44,7 +44,7 @@ python -m medpc2excel
 
 You also can import this module and use the function called medpc_read as following
 ```python
-from medpc2excel import medpc_read
+from medpc2excel.medpc_read import medpc_read
 
 f = <file path>
 

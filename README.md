@@ -7,7 +7,7 @@ medpc2excel can also return a pandas DataFrame for further analysis
 
 I recommend installing an [Anaconda](https://www.anaconda.com/distribution/) distribution of Python -- Choose Python 3.7. 
 
-Use the package manager [pip](https://pip.pypa.io/en/stable/) to install medpc2excel. Current version is 1.7.0
+Use the package manager [pip](https://pip.pypa.io/en/stable/) to install medpc2excel. Current version is 2.02
 
 ```bash
 pip install medpc2excel
@@ -18,8 +18,7 @@ To upgrade medpc2excel (package here), run the following in the environment:
 pip install medpc2excel --upgrade
 ```
 ## Version updating note
-Add working variables report
-Add more writing options: override the entire file (override), replace exisiting data without modify others (replace), append only new data (append)
+Add data explorer to visualize timestampe data
 
 ## Configure *.MPC file
 

@@ -464,8 +464,9 @@ class Ui_MainWindow(object):
         MainWindow.setWindowTitle(_translate("MainWindow", "Behavior Data Extracter"))
         self.datafolder_button.setText(_translate("MainWindow", "Data folder"))
         self.medpctoexcel_button.setText(_translate("MainWindow", "MED-PC to Excel"))
-        self.override.setItemText(0, _translate("MainWindow", "Override existing data"))
-        self.override.setItemText(1, _translate("MainWindow", "Skip existing data"))
+        self.override.setItemText(0, _translate("MainWindow", "Override"))
+        self.override.setItemText(1, _translate("MainWindow", "Replace"))
+        self.override.setItemText(2, _translate("MainWindow", "Append"))
         self.medpctoexcel_progressbar.setFormat(_translate("MainWindow", "%p%"))
         self.tabs.setTabText(self.tabs.indexOf(self.genExcel), _translate("MainWindow", "Generate Excel"))
         self.load_datafile.setText(_translate("MainWindow", "Load file"))
@@ -482,7 +483,7 @@ class Ui_MainWindow(object):
         self.genVar_button.setText(_translate("MainWindow", "Generate Variables"))
         self.genVar_progressbar.setFormat(_translate("MainWindow", "%p%"))
         self.tabs.setTabText(self.tabs.indexOf(self.genVar), _translate("MainWindow", "Generate Variable"))
-        self.info_label.setText(_translate("MainWindow", "Current version v2.0.1 \n"
+        self.info_label.setText(_translate("MainWindow", "Current version v2.0.2 \n"
 "Created by Yifeng Cheng, Ph.D. \n"
 "Contact:\n"
 "(979)571-8531\n"

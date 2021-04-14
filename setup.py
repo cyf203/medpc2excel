@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="medpc2excel",
-    version="1.5.5",
+    version="3.0.7",
     license="MIT",
     author="Yifeng Cheng",
     author_email="cyfhopkins@gmail.com",
@@ -14,7 +14,7 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/cyf203/medpc2excel",
     packages=setuptools.find_packages(),
-    install_requires = ['numpy', 'pandas','dill','openpyxl'],
+    install_requires = ['numpy', 'pandas','dill'],
     include_package_data=True,
     classifiers=(
         "Programming Language :: Python :: 3",

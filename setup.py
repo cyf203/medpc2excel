@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="medpc2excel",
-    version="3.0.7",
+    version="3.0.9",
     license="MIT",
     author="Yifeng Cheng",
     author_email="cyfhopkins@gmail.com",

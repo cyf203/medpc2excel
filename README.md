@@ -7,7 +7,7 @@ medpc2excel can also return a pandas DataFrame for further analysis
 
 I recommend installing an [Anaconda](https://www.anaconda.com/distribution/) distribution of Python -- Choose Python >=3.7. 
 
-Use the package manager [pip](https://pip.pypa.io/en/stable/) to install medpc2excel. Current version is 3.0.7
+Use the package manager [pip](https://pip.pypa.io/en/stable/) to install medpc2excel. Current version is 3.0.9
 
 ```bash
 pip install medpc2excel

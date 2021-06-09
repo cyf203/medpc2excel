@@ -50,18 +50,15 @@ class explore:
         allFile_l = []    
         for subdir, dirs, files in os.walk(self.rootdir):
             for file in files:
-                #exclude configuration file no matter how
-                if 'config' not in file:
-                    #if file has extension
-                    if self.ext != ('',) and self.ext != ():
-                        pat = ".*\.%s"%self.ext
-                        if re.match(pat,file):
-                            if file.split('.')[0] >= str(start) and file.split('.')[0] <= str(end):
-                                allFile_l.append(os.path.join(subdir,file))
-                    #if file has no extension
-                    elif not re.match(".*\..*", file):
-                        if file.split('_')[0] >= str(start) and file.split('_')[0] <= str(end):
-                            allFile_l.append(os.path.join(subdir,file))
+                #if file is *.txt file
+                pat = ".*\.txt"
+                if re.match(pat,file):
+                    if file.split('.')[0] >= str(start) and file.split('.')[0] <= str(end):
+                        allFile_l.append(os.path.join(subdir,file))
+                #if file has no extension
+                if not re.match(".*\..*", file):
+                    if file.split('_')[0] >= str(start) and file.split('_')[0] <= str(end):
+                        allFile_l.append(os.path.join(subdir,file))
         
         if display:
             if self.p:

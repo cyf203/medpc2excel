@@ -194,7 +194,7 @@ def medpc_read (file, working_var_label='', rat_id=None, save=True, skipold = Tr
                             if len(overlap)> 0: # replace existing data and concat new data into files
                                 
                                 book = load_workbook(filename)
-                                writer = pd.ExcelWriter(filename, engine = 'openpyxl')
+                                writer = pd.ExcelWriter(filename, engine = 'openpyxl', mode= 'a')
                                 writer.book = book
                                 MSNs_file = pd.read_excel(filename,sheet_name = 'MSNs')
                                 MSNs_file['ID'] = MSNs_file['ID'].astype('str')
@@ -262,7 +262,7 @@ def medpc_read (file, working_var_label='', rat_id=None, save=True, skipold = Tr
                                     
                                 if not MSN_same or not summary_same: #if two MSNs summary are not the same append current one to the file one
                                     book = load_workbook(filename)
-                                    writer = pd.ExcelWriter(filename, engine = 'openpyxl')
+                                    writer = pd.ExcelWriter(filename, engine = 'openpyxl', mode= 'a')
                                     writer.book = book
                                     
                                     if not MSN_same:
@@ -338,7 +338,7 @@ def medpc_read (file, working_var_label='', rat_id=None, save=True, skipold = Tr
                                     log += nowtime+'>>\t'+'Append new MED-PC data to an existing local excel file %s. Old data was not changed.'%filename +'\n'
                             
             else: # file doesn't exist
-                with pd.ExcelWriter(filename, engine='openpyxl') as writer: # pylint: disable=abstract-class-instantiated
+                with pd.ExcelWriter(filename, engine='openpyxl', mode='w') as writer: # pylint: disable=abstract-class-instantiated
                     MSN_dict[d].to_excel(writer,sheet_name='MSNs',index=False)
                     if working_var_label !='':
                         workingVar_dfs[d].to_excel(writer, sheet_name='Summary_(%s)'%working_var_label, index = True)

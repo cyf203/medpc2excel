@@ -78,8 +78,22 @@ def medpc_read (file, working_var_label='', rat_id=None, save=True, skipold = Tr
                             if var != working_var_label: 
                                 if name != '':
                                     name = re.sub('[\s]*', '', name)
+                                    TS_var_name_map[var] = "(%s)"%var+name #'map' of vars with corresponding label
+                                    TS_var_name_maps[programname] = TS_var_name_map
+                                    
+                        elif 'LIST' in line: #in addition to Arrays (DIM), may also have Lists (LIST)
+                            pat = re.compile(r'(LIST\s*)(\w)([\s=\d]*)([\s\\]*)(\w*\s*\w*)(\s+)([\w\(\)]*)')
+                            # var, name = pat.search(line).group(2) pat.search(line).group(4)
+                            #dp unfamiliar with regex, var will still match group(2) but just using string.find() to get name
+                            var= pat.search(line).group(2)
+                            name= line[line.find('\\')+1:-1] #find the \ denoting label start and go to end 
+                        
+                            if var != working_var_label: 
+                                if name != '':
+                                    name = re.sub('[\s]*', '', name)
                                     TS_var_name_map[var] = "(%s)"%var+name
                                     TS_var_name_maps[programname] = TS_var_name_map
+                                    
                         elif working_var_label != '':
                             if re.match(r'\s*\\\s*%s\(\d*\)'%working_var_label, line):
                                 pat = re.compile(r'(\s*\\\s*)(%s\()(\d*)(\))\W*([\w\s\(\)]*)([\w\s\(\),\/]*)'%working_var_label) 
@@ -314,7 +328,7 @@ def medpc_read (file, working_var_label='', rat_id=None, save=True, skipold = Tr
                                     
                                 if not MSN_same or not summary_same: #if two MSNs summary are not the same append current one to the file one
                                     book = load_workbook(filename)
-                                    writer = pd.ExcelWriter(filename, engine = 'openpyxl')
+                                    writer = pd.ExcelWriter(filename, engine = 'openpyxl', mode='a')
                                     writer.book = book
                                     
                                     if not MSN_same:

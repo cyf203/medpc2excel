@@ -44,9 +44,6 @@ The most quickest way to start is to open the GUi from a command line terminal i
 python -m medpc2excel
 ```
 
-You can use data explorer tab to see the raster of each events.
-![alt text](https://github.com/cyf203/medpc2excel/blob/master/example/example_fig2.jpg)
-
 You also can import this module and use the function called medpc_read as following
 ```python
 from medpc2excel.medpc_read import medpc_read

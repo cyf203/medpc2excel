@@ -65,8 +65,8 @@ Please make sure to update tests as appropriate
 
 ## Dependencies 
 
-Pandas\
-Numpy\
-dill\
-mplcursors\
-openpyxl
+Pandas=1.1.3\
+Numpy=1.19.2\
+dill=0.3.3\
+mplcursors=0.3\
+openpyxl=3.0.5

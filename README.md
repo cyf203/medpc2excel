@@ -5,7 +5,7 @@ medpc2excel can also return a pandas DataFrame for further analysis
 
 ## Installation
 
-I recommend installing an [Anaconda](https://www.anaconda.com/distribution/) distribution of Python -- Choose Python >=3.7. 
+I recommend installing an [Anaconda](https://www.anaconda.com/distribution/) distribution of Python -- Choose Python 3.7 (higher version like 3.11 causes problem). 
 
 Use the package manager [pip](https://pip.pypa.io/en/stable/) to install medpc2excel. Current version is 3.0.9
 
@@ -63,7 +63,7 @@ Please download the  ```Example``` folder to your local disk and run the ```medp
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change. 
 Please make sure to update tests as appropriate
 
-## Dependencies 
+## Dependencies
 
 Pandas=1.1.3\
 Numpy=1.19.2\

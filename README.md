@@ -71,4 +71,4 @@ dill=0.3.3\
 mplcursors=0.3\
 openpyxl=3.0.5\
 matplotlib=3.5.3\
-PyQt = 5.11.3\
+PyQt = 5.11.3

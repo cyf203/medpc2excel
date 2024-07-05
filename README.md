@@ -65,10 +65,11 @@ Please make sure to update tests as appropriate.
 
 ## Dependencies
 
-Pandas=1.1.3\
-Numpy=1.19.2\
-dill=0.3.3\
-mplcursors=0.3\
-openpyxl=3.0.5\
-matplotlib=3.5.3\
-PyQt = 5.11.3
+Pandas==1.3.5
+Numpy==1.21.6
+dill==0.3.7
+mplcursors==0.3
+openpyxl==3.0.5
+matplotlib==3.5.3
+PyQt5==5.11.3
+Medpc2excel==3.0.9

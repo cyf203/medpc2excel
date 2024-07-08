@@ -6,17 +6,18 @@ medpc2excel can also return a pandas DataFrame for further analysis
 ## Installation
 
 I recommend installing an [Anaconda](https://www.anaconda.com/distribution/) distribution of Python -- Choose Python 3.7 (a higher version like 3.11 causes a problem). 
-
 Use the package manager [pip](https://pip.pypa.io/en/stable/) to install medpc2excel. The current version is 3.0.9
 
 ```bash
 pip install medpc2excel
 ```
 
-To upgrade medpc2excel (package here), run the following in the environment:
+If you downloaded or installed the latest version of Anaconda or Miniconda. You can create a conda environment in your cmd. To do so: 
 ```bash
-pip install medpc2excel --upgrade
+conda env create --name <envname> --file=environments.yml
 ```
+
+
 ## Version updating note
 Add data explorer to visualize timestamp data
 

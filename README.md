@@ -16,7 +16,9 @@ If you downloaded or installed the latest version of Anaconda or Miniconda. You 
 ```bash
 conda env create --name <envname> --file=environments.yml
 ```
-
+```bas
+pip install -r requirements.txt
+```
 
 ## Version updating note
 Add data explorer to visualize timestamp data

@@ -16,7 +16,9 @@ If you downloaded or installed the latest version of Anaconda or Miniconda. You 
 ```bash
 conda env create --name <envname> --file=environments.yml
 ```
-```bas
+
+If conda has problem to install dependencies, you can also run:
+```bash
 pip install -r requirements.txt
 ```
 

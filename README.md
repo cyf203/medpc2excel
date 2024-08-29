@@ -9,7 +9,7 @@ I recommend installing an [Anaconda](https://www.anaconda.com/distribution/) dis
 Use the package manager [pip](https://pip.pypa.io/en/stable/) to install medpc2excel. The current version is 3.0.9
 
 ```bash
-pip install medpc2excel
+pip install medpc2excel==3.0.9
 ```
 
 If you downloaded or installed the latest version of Anaconda or Miniconda. You can create a conda environment in your cmd. To do so: 

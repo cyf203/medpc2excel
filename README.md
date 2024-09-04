@@ -40,6 +40,12 @@ In *.MPC file, please explicitly declare each array as below:
     
 <... your MPC code ...>
 ```
+## Naming and formatting medpc data file
+Please make sure medpc data file is a 'file' but not not a '*.txt' file. If so, just remove *.txt at the end
+Please make sure the data file's name starts with some number. I usually keep a time tag like:
+'20240904_xxx'
+But it can also be any number like:
+'2000_xxx'
 
 ## Running medpc2excel
 

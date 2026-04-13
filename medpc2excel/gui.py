@@ -9,7 +9,6 @@ import numpy as np   #for calculaiton
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import mplcursors
-import dill
 # from openpyxl import load_workbook
 from datetime import datetime
 from collections import defaultdict
@@ -18,6 +17,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets  #QtCore, QtGui
 from PyQt5.QtWidgets import QMessageBox
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
+from medpc2excel import __version__
 from medpc2excel.medpc_read import medpc_read
 
 #%% Utilities Class
@@ -51,12 +51,12 @@ class explore:
         for subdir, dirs, files in os.walk(self.rootdir):
             for file in files:
                 #if file is *.txt file
-                pat = ".*\.txt"
+                pat = r".*\.txt"
                 if re.match(pat,file):
                     if file.split('.')[0] >= str(start) and file.split('.')[0] <= str(end):
                         allFile_l.append(os.path.join(subdir,file))
                 #if file has no extension
-                if not re.match(".*\..*", file):
+                if not re.match(r".*\..*", file):
                     if file.split('_')[0] >= str(start) and file.split('_')[0] <= str(end):
                         allFile_l.append(os.path.join(subdir,file))
         
@@ -446,7 +446,7 @@ class Ui_MainWindow(object):
         self.label_sessiondur.setText(_translate("MainWindow", "Session duration (mins)"))
         self.plot.setText(_translate("MainWindow", "Plot"))
         self.tabs.setTabText(self.tabs.indexOf(self.dataexplorer), _translate("MainWindow", "Data Explorer"))
-        self.info_label.setText(_translate("MainWindow", "Current version v3.0.7 \n"
+        self.info_label.setText(_translate("MainWindow", f"Current version v{__version__} \n"
 "Created by Yifeng Cheng, Ph.D. \n"
 "Contact:\n"
 "(979)571-8531\n"
@@ -467,38 +467,52 @@ class MyApp (QtWidgets.QMainWindow, Ui_MainWindow):
         self.update_events_list_Button.clicked.connect(self.__update_events_list_frombutton)
         self.add_events_Button.clicked.connect(self.__add_select_events_frombutton)
         self.plot.clicked.connect(self.__dataexplorer)
-        self.currentTime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     #stream output to text PYQT5 text widgets
     def on_myStream_message(self, message):
         self.log.append (message)
+
+    def __timestamp(self):
+        return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    def __append_log_message(self, message):
+        self.log.append(f"{self.__timestamp()}>>\t{message}")
     
     ################################################
     # Tab 1 functions
     ################################################
     def __set_data_folder_frombutton(self):
         path_frombutton = QtWidgets.QFileDialog.getExistingDirectory()
+        if not path_frombutton:
+            return
         self.datafolder_path_input.clear()
         self.datafolder_path_input.append(path_frombutton)
         #options = QtWidgets.QFileDialog.Options()
         #options = QtWidgets.QFileDialog.DontUseNativeDialog
         self.datafolder = path_frombutton
-        self.log.append (self.currentTime+'>>\t'+'Set data folder: %s'%self.datafolder)
+        self.__append_log_message('Set data folder: %s' % self.datafolder)
     
     def __run_medpc2excel(self):
         datafolder = self.datafolder_path_input.toPlainText()
+        if not datafolder:
+            self.__append_log_message("Error!Please choose a data folder before running extraction.")
+            return
+        if not os.path.isdir(datafolder):
+            self.__append_log_message(f"Error!Data folder does not exist: {datafolder}")
+            return
+
         working_var_label = self.workingVar_label_text.toPlainText()
         #get path for all *. data file
         files = explore(datafolder,*[''],kernalmsg=False)
         #get a list of data file
         datafile_list = files.get_dir_list(display=False)
-        self.log.append (self.currentTime+'>>\t'+'Found %s files'%(len(datafile_list)))
+        self.__append_log_message('Found %s files' % (len(datafile_list)))
         override = str(self.override.currentText())
         if override == 'New':
             skipexist = True
             replace_file = True
             replace_data  = True
-        if override == 'Override':
+        elif override == 'Override':
             skipexist = False
             replace_file = True
             replace_data  = True
@@ -512,13 +526,34 @@ class MyApp (QtWidgets.QMainWindow, Ui_MainWindow):
             replace_data = False
         
         total = len(datafile_list)
+        if total == 0:
+            self.medpctoexcel_progressbar.setValue(0)
+            return
+
+        self.medpctoexcel_progressbar.setValue(0)
         func_out = ''
-        for n, f in enumerate(datafile_list):
+        for n, f in enumerate(datafile_list, 1):
             #get all data from this session
-            _, func_out = medpc_read(f, working_var_label, skipold = skipexist, override = replace_file, replace = replace_data, log = func_out) #pass TS_df_tree to an anonymous variable
-            self.medpctoexcel_progressbar.setValue(n/total*100)
-        self.medpctoexcel_progressbar.setValue(100)
-        self.log.append(func_out)
+            previous_log = func_out
+            try:
+                _, func_out = medpc_read(
+                    f,
+                    working_var_label,
+                    skipold=skipexist,
+                    override=replace_file,
+                    replace=replace_data,
+                    log=func_out,
+                )
+            except Exception as exc:
+                func_out = previous_log
+                self.__append_log_message(f"Error!Failed to process {f}: {exc}")
+            else:
+                new_output = func_out[len(previous_log):]
+                if new_output.strip():
+                    for line in new_output.rstrip().splitlines():
+                        self.log.append(line)
+            self.medpctoexcel_progressbar.setValue(int((n / total) * 100))
+            QtWidgets.QApplication.processEvents()
 
 
     ################################################
@@ -527,6 +562,8 @@ class MyApp (QtWidgets.QMainWindow, Ui_MainWindow):
     def __load_exceldata_file_frombutton(self):
         options = QtWidgets.QFileDialog.Options()
         self.filepath, _ = QtWidgets.QFileDialog.getOpenFileName(self,"Load data file", "","*.xlsx;;All Files (*)", options=options)
+        if not self.filepath:
+            return None
         self.datafile_path.clear()
         self.datafile_path.append(self.filepath)
         
@@ -534,11 +571,21 @@ class MyApp (QtWidgets.QMainWindow, Ui_MainWindow):
     
     def __update_events_list_frombutton (self):
         rat_ids_str = self.input_ids.toPlainText()
+        if not getattr(self, "filepath", ""):
+            self.__append_log_message("Error!Please load an Excel file before updating the event list.")
+            return None
+        if not rat_ids_str.strip():
+            self.__append_log_message("Error!Please provide at least one subject ID.")
+            return None
         file = self.filepath
-        self.data_explr_rat_ids = rat_ids_str.split(',')
+        self.data_explr_rat_ids = [rat.strip() for rat in rat_ids_str.split(',') if rat.strip()]
         rat_ids = self.data_explr_rat_ids
         # read data
-        pd_file = pd.ExcelFile(file)
+        try:
+            pd_file = pd.ExcelFile(file, engine='openpyxl')
+        except Exception as exc:
+            self.__append_log_message(f"Error!Could not open Excel file {file}: {exc}")
+            return None
         sheets = pd_file.sheet_names
         
         self.data_explr_df_dict = {}
@@ -548,6 +595,7 @@ class MyApp (QtWidgets.QMainWindow, Ui_MainWindow):
                 self.data_explr_df_dict[str(rat)] = pd.read_excel(file, sheet_name = str(rat))
                 colname = list(self.data_explr_df_dict[str(rat_ids[0])].columns)
             else:
+                self.__append_log_message(f"Error!Invalid ID for data explorer: {rat}")
                 QMessageBox.about(self, 'Error', 'Invalid ID: %s'%rat)
         
         self.events_combo.clear()
@@ -574,13 +622,30 @@ class MyApp (QtWidgets.QMainWindow, Ui_MainWindow):
         # rat_ids = rat_ids_str.split(',')
         events_str = self.input_events.toPlainText()
         sessiondur_str = self.input_session_dur.toPlainText()
-        target_event = events_str.split(',')
-        session_time_min = float(sessiondur_str)
+        if not getattr(self, "filepath", ""):
+            self.__append_log_message("Error!Please load an Excel file before plotting.")
+            return None
+        if not getattr(self, "data_explr_rat_ids", []):
+            self.__append_log_message("Error!Please update the event list before plotting.")
+            return None
+        target_event = [event.strip() for event in events_str.split(',') if event.strip()]
+        if not target_event:
+            self.__append_log_message("Error!Please choose at least one event before plotting.")
+            return None
+        try:
+            session_time_min = float(sessiondur_str)
+        except ValueError:
+            self.__append_log_message(f"Error!Invalid session duration: {sessiondur_str}")
+            return None
         
         file = self.filepath
         rat_ids = self.data_explr_rat_ids
         
-        pd_file = pd.ExcelFile(file)
+        try:
+            pd_file = pd.ExcelFile(file, engine='openpyxl')
+        except Exception as exc:
+            self.__append_log_message(f"Error!Could not open Excel file {file}: {exc}")
+            return None
         sheets = pd_file.sheet_names
         
         
@@ -591,7 +656,12 @@ class MyApp (QtWidgets.QMainWindow, Ui_MainWindow):
                 df_dict[str(rat)] = pd.read_excel(file, sheet_name = str(rat))
                 plot_ids.append(str(rat))
             else:
+                self.__append_log_message(f"Error!Skip ID during plotting: {rat}")
                 QMessageBox.about(self, 'Plot Error', 'Skip ID: %s'%rat)
+
+        if not plot_ids:
+            self.__append_log_message("Error!No valid IDs were available for plotting.")
+            return None
 
         # df_dict = self.data_explr_df_dict
         
@@ -620,7 +690,7 @@ class MyApp (QtWidgets.QMainWindow, Ui_MainWindow):
                       '#FFC000',
                       '#993366']   # Support up to 10 events
         
-        fig, axes = plt.subplots(len(rat_ids),1, sharex = True, sharey = False)
+        fig, axes = plt.subplots(len(plot_ids),1, sharex = True, sharey = False)
         
         fig.set_size_inches(7, 5)
         
@@ -642,11 +712,15 @@ class MyApp (QtWidgets.QMainWindow, Ui_MainWindow):
             min_iei = []
             max_iei = []
             for n,e in enumerate(target_event):
+                if e not in df.columns:
+                    self.__append_log_message(f"Error!Event {e} was not found for subject {rat}.")
+                    continue
                 x = df[e][df[e].notnull()].values
                 x = x[x>0] # get rid of invalide timestamp
-                counts.append(sum((x/60) < session_time_min))
-                lat.append(x[0])
-                iei = np.diff(x[(x/60) < session_time_min])
+                x = x[(x/60) < session_time_min]
+                counts.append(len(x))
+                lat.append(x[0] if len(x) else np.nan)
+                iei = np.diff(x)
                 if len(iei) > 0:
                     mean_iei.append(np.mean(iei))
                     min_iei.append(min(iei))
@@ -658,6 +732,10 @@ class MyApp (QtWidgets.QMainWindow, Ui_MainWindow):
                 ax.eventplot(x/60, orientation = 'horizontal', lineoffsets = (n+0.5), linelengths = 0.5, linewidths = 0.5, color = color_list[n])
                 label_pos.append(n+0.5)
                 labels.append(e[3:])
+
+            if not label_pos:
+                self.__append_log_message(f"Error!No valid events were available to plot for subject {rat}.")
+                continue
                 
             #spine visibility
             ax.spines['top'].set_visible(False)
@@ -679,7 +757,11 @@ class MyApp (QtWidgets.QMainWindow, Ui_MainWindow):
             ax.set_xlim(-0.5, session_time_min+0.5)
             
             for idx, count in enumerate(counts,1):
-                text = 'count = %s,lat(s) = %.2f\nmean_IEI(s) = %.2f [max = %.2fs, min = %.2fs]'%(count, lat[idx-1], mean_iei[idx-1], max_iei[idx-1], min_iei[idx-1])
+                lat_text = "NA" if np.isnan(lat[idx-1]) else f"{lat[idx-1]:.2f}"
+                mean_text = "NA" if np.isnan(mean_iei[idx-1]) else f"{mean_iei[idx-1]:.2f}"
+                max_text = "NA" if np.isnan(max_iei[idx-1]) else f"{max_iei[idx-1]:.2f}"
+                min_text = "NA" if np.isnan(min_iei[idx-1]) else f"{min_iei[idx-1]:.2f}"
+                text = 'count = %s,lat(s) = %s\nmean_IEI(s) = %s [max = %ss, min = %ss]'%(count, lat_text, mean_text, max_text, min_text)
                 ax.text(0, idx/len(counts), text, transform = ax.transAxes, fontsize = 8, verticalalignment = 'top', bbox = props_inplot)
                 
         mplcursors.cursor(highlight=True).connect("add", lambda sel: sel.annotation.set_text(sel.artist.get_label()))

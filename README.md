@@ -5,14 +5,15 @@ medpc2excel can also return a pandas DataFrame for further analysis
 
 ## Installation
 
-I recommend installing an [Anaconda](https://www.anaconda.com/distribution/) distribution of Python -- Choose Python 3.7 (a higher version like 3.11 causes a problem). 
-Use the package manager [pip](https://pip.pypa.io/en/stable/) to install medpc2excel. The current version is 3.0.9
+I recommend installing an [Anaconda](https://www.anaconda.com/distribution/) distribution of Python.
+The current validation target is Python 3.12.
+Use the package manager [pip](https://pip.pypa.io/en/stable/) to install medpc2excel. The current version is 4.0.0
 
 ```bash
-pip install medpc2excel==3.0.9
+pip install medpc2excel==4.0.0
 ```
 
-If you downloaded or installed the latest version of Anaconda or Miniconda. You can create a conda environment in your cmd. To do so: 
+If you downloaded or installed the latest version of Anaconda or Miniconda, you can create a conda environment in your cmd. To do so: 
 ```bash
 conda env create --name <envname> --file=environments.yml
 ```
@@ -23,7 +24,8 @@ pip install -r requirements.txt
 ```
 
 ## Version updating note
-Add data explorer to visualize timestamp data
+Version 4.0.0 updates the package for Python 3.12, current pandas/openpyxl behavior,
+and more resilient handling of malformed MED-PC chunks.
 
 ## Configure *.MPC file
 
@@ -55,6 +57,12 @@ The quickest way to start is to open the GUi from a command line terminal in Ana
 python -m medpc2excel
 ```
 
+After installing the package, you can also launch the GUI directly with:
+
+```bash
+medpc2excel
+```
+
 You can use the data explorer tab to see the raster of each event.
 ![alt text](https://github.com/cyf203/medpc2excel/blob/master/example/example_fig2.jpg)
 
@@ -76,11 +84,9 @@ Please make sure to update tests as appropriate.
 
 ## Dependencies
 
-Pandas==1.3.5\
-Numpy==1.21.6\
-dill==0.3.7\
-mplcursors==0.3\
-openpyxl==3.0.5\
-matplotlib==3.5.3\
-PyQt5==5.11.3\
-Medpc2excel==3.0.9
+numpy==2.4.1\
+pandas==2.3.3\
+openpyxl==3.1.5\
+matplotlib==3.10.8\
+mplcursors==0.7.1\
+PyQt5==5.15.10

@@ -1,6 +1,6 @@
 import setuptools
 
-with open("README.md", "r") as fh:
+with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setuptools.setup(
@@ -15,6 +15,7 @@ setuptools.setup(
     url="https://github.com/cyf203/medpc2excel",
     packages=setuptools.find_packages(),
     python_requires=">=3.10",
+    license_files=["LICENSE"],
     install_requires=[
         "numpy>=2.4",
         "pandas>=2.3",
@@ -29,9 +30,8 @@ setuptools.setup(
         ]
     },
     include_package_data=True,
-    classifiers=(
+    classifiers=[
         "Programming Language :: Python :: 3",
-        "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
-    ),
+    ],
 )

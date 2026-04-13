@@ -128,3 +128,5 @@ dmypy.json
 # Pyre type checker
 .pyre/
 Backup/
+TestData/
+.DS_Store

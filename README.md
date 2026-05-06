@@ -13,6 +13,12 @@ Use the package manager [pip](https://pip.pypa.io/en/stable/) to install medpc2e
 pip install medpc2excel==4.0.0
 ```
 
+To install directly from GitHub and bypass PyPI, run:
+
+```bash
+pip install "git+https://github.com/cyf203/medpc2excel.git"
+```
+
 If you downloaded or installed the latest version of Anaconda or Miniconda, you can create a conda environment in your cmd. To do so: 
 ```bash
 conda env create --name <envname> --file=environments.yml
